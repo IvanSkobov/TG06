@@ -1,0 +1,557 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+h1 {
+    font-size: 24px;
+    color: #2c3e50;
+}
+
+/* Calendar styles */
+.calendar-container {
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    padding: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.calendar-nav button {
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.calendar-nav button:hover {
+    background: #3a5bd9;
+}
+
+.calendar-nav button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.calendar-header button:hover {
+    background-color: #f0f2f5;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(70px, 1fr));
+    width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #d9d9d9;
+    border-top: none;
+    gap: 2px;
+    background-color: #e0e0e0;
+    padding: 2px;
+}
+
+.calendar-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    margin-bottom: 2px;
+    text-align: center;
+    background-color: #f2f2f2;
+    border: 1px solid #d9d9d9;
+    border-bottom: none;
+}
+
+.day-header {
+    font-weight: 600;
+    padding: 8px 4px;
+    background-color: #4472c4;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    border-right: 1px solid #d9d9d9;
+}
+
+.day-header:last-child {
+    border-right: none;
+}
+
+.day {
+    position: relative;
+    min-height: 80px;
+    height: 100%;
+    padding: 8px 4px;
+    border: 1px solid #d9d9d9;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 1;
+}
+
+/* Rate type colors - brighter version */
+.calendar-day {
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+/* Standard rate */
+.calendar-day.rate-standard {
+    background-color: #BDD7EE !important; /* Brighter blue */
+}
+
+.calendar-day.rate-standard .day-number {
+    color: #2E75B6 !important; /* More vibrant blue */
+    font-weight: 600;
+}
+
+/* With student */
+.calendar-day.rate-withStudent {
+    background-color: #D9D1E9 !important; /* Brighter purple */
+}
+
+.calendar-day.rate-withStudent .day-number {
+    color: #7030A0 !important; /* More vibrant purple */
+    font-weight: 600;
+}
+
+/* 2 of 3 */
+.calendar-day.rate-twoOfThree {
+    background-color: #C6E0B4 !important; /* Brighter green */
+}
+
+.calendar-day.rate-twoOfThree .day-number {
+    color: #4472C4 !important; /* More vibrant green */
+    font-weight: 600;
+}
+
+/* 2 of 4 */
+.calendar-day.rate-twoOfFour {
+    background-color: #F4B183 !important; /* Brighter orange */
+}
+
+.calendar-day.rate-twoOfFour .day-number {
+    color: #E46C0A !important; /* More vibrant orange */
+    font-weight: 600;
+}
+
+/* Bonus indicator */
+.calendar-day.has-bonus::after {
+    content: '20%';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ffcc00;
+    color: #000;
+    font-size: 0.7em;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Hover effects */
+.calendar-day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 2;
+}
+
+/* Selected day highlight */
+.calendar-day.selected {
+    box-shadow: 0 0 0 2px #2196F3;
+    z-index: 3;
+}
+
+/* Weekend days */
+.day.weekend {
+    background-color: #f8f9fa;
+    opacity: 0.9;
+}
+
+/* Bonus indicator */
+.day.has-bonus::after {
+    content: '20%';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ffcc00;
+    color: #000;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.day:hover {
+    background-color: #f8f9fa;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    align-self: flex-end;
+    margin: 0 0 4px 0;
+    padding: 2px 6px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.day-amount {
+    font-size: 12px;
+    color: #2c3e50;
+    margin-top: auto;
+    text-align: center;
+    padding: 4px 0;
+    font-weight: 500;
+    background: rgba(255,255,255,0.8);
+    border-radius: 4px;
+    margin: 4px 0 0 0;
+}
+
+.day.other-month {
+    opacity: 0.4;
+    background-color: #f8f9fa;
+}
+
+.day.has-entries {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+}
+
+/* Day details styles */
+.day-details {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.day-details h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.rate-option, .salary-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.rate-option label, .salary-option label {
+    width: 120px;
+    font-weight: 500;
+}
+
+.rate-option input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.rate-input {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+
+.bonus-label {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    color: #666;
+}
+
+.bonus-checkbox {
+    margin-left: 5px;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding: 15px;
+    background: #e8f5e9;
+    border-radius: 4px;
+    font-size: 1.1em;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #43a047;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    background: none;
+    border: none;
+    padding: 5px;
+}
+
+/* Color coding for rate types */
+.day.standard {
+    background-color: #d9e1f2;  /* Light blue */
+}
+
+.day.two-of-three {
+    background-color: #f4b084;  /* Orange */
+}
+
+.day.two-of-four {
+    background-color: #8ea9db;  /* Blue */
+}
+
+.day.with-student {
+    background-color: #ffd966;  /* Yellow */
+}
+
+/* Keep weekend background for empty cells */
+.day.weekend:not(.standard):not(.two-of-three):not(.two-of-four):not(.with-student) {
+    background-color: #f2f2f2;
+}
+
+/* Rate type selector */
+.rate-type-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.rate-option {
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+}
+
+.rate-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rate-option.selected {
+    border-color: #2196f3;
+    background-color: #e3f2fd;
+}
+
+.rate-option.standard { background-color: #e3f2fd; }
+.rate-option.two-of-three { background-color: #e8f5e9; }
+.rate-option.two-of-four { background-color: #fff8e1; }
+.rate-option.with-student { background-color: #f3e5f5; }
+
+/* Summary section */
+.summary {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.summary-total {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px solid #2196f3;
+}
+
+/* Bonus toggle */
+.bonus-toggle {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bonus-toggle label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.bonus-toggle input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.setting-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.setting-option label {
+    width: 150px;
+}
+
+.setting-option input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 120px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .calendar-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+    
+    .day {
+        padding: 4px;
+        font-size: 14px;
+    }
+    
+    .rate-option, .salary-option {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .rate-option label, .salary-option label {
+        margin-bottom: 5px;
+    }
+    
+    .bonus-label {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
