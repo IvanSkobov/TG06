@@ -31,6 +31,7 @@ class RateCalculator {
         this.baseTotalEl = document.getElementById('baseTotal');
         this.extraTotalEl = document.getElementById('extraTotal');
         this.monthlyTotalEl = document.getElementById('monthlyTotal');
+        this.netExtraTotalEl = document.getElementById('netExtraTotal');
 
         // State
         this.currentDate = new Date();
@@ -38,6 +39,10 @@ class RateCalculator {
         this.selectedRateType = null;
         this.entries = this.loadEntries();
         this.rates = this.loadRates();
+        
+        // Month picker
+        this.monthPicker = document.getElementById('monthPicker');
+        this.initMonthPicker();
         
         // Initialize the app
         this.initEventListeners();
@@ -138,7 +143,7 @@ class RateCalculator {
             // Add day number first
             dayEl.innerHTML = `
                 <div class="day-number">${day}</div>
-                <div class="day-amount">${entry ? this.formatCurrency(entry.customRate || this.rates[entry.rateType] || 0) : this.formatCurrency(0)}</div>
+                <div class="day-amount">${entry ? this.formatWithSpaces(entry.customRate || this.rates[entry.rateType] || 0) + ' ₸' : this.formatWithSpaces(0) + ' ₸'}</div>
             `;
             
             // Add entry data if exists
@@ -299,12 +304,17 @@ class RateCalculator {
         
         // Calculate totals
         const totalExtras = extraTotal + bonusTotal;
-        const monthlyTotal = baseTotal + totalExtras;
-        
+        const netExtra = (totalExtras * 0.625) - 8500;
+        const monthlyTotal = baseTotal + netExtra;
+
         // Update the UI
-        this.baseTotalEl.textContent = baseTotal.toFixed(2);
-        this.extraTotalEl.textContent = totalExtras.toFixed(2);
-        this.monthlyTotalEl.textContent = monthlyTotal.toFixed(2);
+        this.baseTotalEl.textContent = this.formatWithSpaces(baseTotal) + ' ₸';
+        this.extraTotalEl.textContent = this.formatWithSpaces(totalExtras) + ' ₸';
+        const netExtraEl = document.getElementById('netExtraTotal');
+        if (netExtraEl) {
+            netExtraEl.textContent = this.formatWithSpaces(netExtra) + ' ₸';
+        }
+        this.monthlyTotalEl.textContent = this.formatWithSpaces(monthlyTotal) + ' ₸';
     }
     
     // Change month
@@ -348,46 +358,65 @@ class RateCalculator {
         this.showMessage('Настройки сохранены', 'success');
     }
     
-    // Export to table
+    // Helper: Format number with 2 decimal places
+    formatNumber(num) {
+        return parseFloat(num || 0).toFixed(2);
+    }
+    
+    // Helper: Format number with spaces for thousands
+    formatWithSpaces(num) {
+        return this.formatNumber(num).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    
+    // Экспорт только сводной таблицы по ставкам
     exportToTable() {
-        // Create CSV content
-        let csvContent = 'data:text/csv;charset=utf-8,';
-        
-        // Add headers
-        csvContent += 'Дата,Тип ставки,Ставка,Надбавка,Зарплата,Итого\n';
-        
-        // Add data rows
-        Object.entries(this.entries)
-            .sort((a, b) => new Date(a[1].date) - new Date(b[1].date))
-            .forEach(([date, entry]) => {
-                const entryDate = new Date(entry.date);
-                const rateType = this.getRateTypeName(entry.rateType);
-                const rate = entry.customRate || this.rates[entry.rateType] || 0;
-                const bonus = entry.hasBonus ? (this.rates.standard || 0) * 0.2 : 0;
-                const salary = entry.salary || 0;
-                const total = rate + bonus + parseFloat(salary);
-                
-                csvContent += `${entryDate.toLocaleDateString('ru-RU')},${rateType},${rate},${bonus.toFixed(2)},${salary},${total.toFixed(2)}\n`;
-            });
-        
-        // Add summary row
-        const baseTotal = parseFloat(this.baseTotalEl.textContent) || 0;
-        const extraTotal = parseFloat(this.extraTotalEl.textContent) || 0;
-        csvContent += `\nБазовый оклад,,,,${baseTotal.toFixed(2)}\n`;
-        csvContent += `Доплаты,,,,${extraTotal.toFixed(2)}\n`;
-        csvContent += `Итого,,,,${(baseTotal + extraTotal).toFixed(2)}\n`;
-        
-        // Create download link
-        const encodedUri = encodeURI(csvContent);
+        // Считаем количество дней по каждой ставке за выбранный месяц
+        const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        const month = this.currentDate.getMonth();
+        const year = this.currentDate.getFullYear();
+        const rateTypes = ['standard', 'twoOfThree', 'twoOfFour', 'withStudent'];
+        const rateNames = {
+            standard: 'Стандарт',
+            twoOfThree: '2 из 3',
+            twoOfFour: '2 из 4',
+            withStudent: 'Со студентом'
+        };
+        const counts = { standard: 0, twoOfThree: 0, twoOfFour: 0, withStudent: 0 };
+
+        Object.values(this.entries).forEach(entry => {
+            const entryDate = new Date(entry.date);
+            if (entryDate.getMonth() === month && entryDate.getFullYear() === year) {
+                if (counts[entry.rateType] !== undefined) {
+                    counts[entry.rateType]++;
+                }
+            }
+        });
+
+        // Формируем CSV
+        let csv = `Отчет по ставкам за ${months[month]} ${year}\n`;
+        csv += '\n';
+        csv += 'Ставка,Количество дней\n';
+        rateTypes.forEach(type => {
+            csv += `${rateNames[type]},${counts[type]}\n`;
+        });
+        csv += '\n';
+        // Итоговые суммы
+        csv += `Базовая сумма (стандарт):,${this.baseTotalEl.textContent}\n`;
+        csv += `Сумма доплат:,${this.extraTotalEl.textContent}\n`;
+        const netExtraEl = document.getElementById('netExtraTotal');
+        if (netExtraEl) {
+            csv += `Чистая сумма доплат:,${netExtraEl.textContent}\n`;
+        }
+        csv += `Итого за месяц:,${this.monthlyTotalEl.textContent}\n`;
+
+        // Сохраняем как обычный csv-файл с BOM для корректного открытия в Excel
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', `rate_calculator_${new Date().toISOString().split('T')[0]}.csv`);
+        link.href = URL.createObjectURL(blob);
+        link.download = `rates_summary_${months[month]}_${year}.csv`;
         document.body.appendChild(link);
-        
-        // Trigger download
         link.click();
-        
-        // Cleanup
         document.body.removeChild(link);
     }
     
@@ -410,17 +439,6 @@ class RateCalculator {
     // Format date as YYYY-MM-DD (alias for formatDateKey for backward compatibility)
     formatDate(date) {
         return this.formatDateKey(date);
-    }
-    
-    // Format number as currency (Kazakhstani Tenge)
-    formatCurrency(amount) {
-        return new Intl.NumberFormat('kk-KZ', {
-            style: 'currency',
-            currency: 'KZT',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-            currencyDisplay: 'symbol'
-        }).format(amount).replace('KZT', '₸');
     }
     
     // Helper: Show message
@@ -449,5 +467,25 @@ class RateCalculator {
             twoOfFour: 0,
             withStudent: 0
         };
+    }
+    
+    // Initialize month picker
+    initMonthPicker() {
+        const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        const currentYear = this.currentDate.getFullYear();
+        this.monthPicker.innerHTML = '';
+        months.forEach((month, i) => {
+            const option = document.createElement('option');
+            option.value = `${currentYear}-${i+1}`;
+            option.textContent = `${month} ${currentYear}`;
+            if (i === this.currentDate.getMonth()) option.selected = true;
+            this.monthPicker.appendChild(option);
+        });
+        this.monthPicker.addEventListener('change', (e) => {
+            const [year, month] = e.target.value.split('-').map(Number);
+            this.currentDate = new Date(year, month - 1, 1);
+            this.renderCalendar();
+            this.updateSummary();
+        });
     }
 }

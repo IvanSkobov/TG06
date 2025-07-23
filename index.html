@@ -18,6 +18,10 @@
         </header>
 
         <div class="calendar-container">
+            <div class="month-sidebar">
+                <label for="monthPicker">Месяц:</label>
+                <select id="monthPicker"></select>
+            </div>
             <div class="calendar-header">
                 <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
                 <h2 id="currentMonth">Июль 2025</h2>
@@ -38,6 +42,10 @@
             <div class="summary-item">
                 <span>Сумма доплат:</span>
                 <span id="extraTotal">0 ₽</span>
+            </div>
+            <div class="summary-item">
+                <span>Чистая сумма доплат (минус 37,5% и 8500₸):</span>
+                <span id="netExtraTotal">0 ₸</span>
             </div>
             <div class="summary-item summary-total">
                 <span>Итого за месяц:</span>
